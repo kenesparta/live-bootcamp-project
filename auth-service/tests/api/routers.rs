@@ -10,7 +10,6 @@ async fn root_returns_auth_ui() {
     assert_eq!(response.headers().get("content-type").unwrap(), "text/html");
 }
 
-
 #[tokio::test]
 async fn test_get_signup() {
     let app = TestApp::new().await;
@@ -50,4 +49,3 @@ async fn test_get_verify_token() {
 
     assert_eq!(response.status(), reqwest::StatusCode::OK);
 }
-
