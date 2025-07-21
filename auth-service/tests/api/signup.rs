@@ -1,5 +1,5 @@
-use reqwest::StatusCode;
 use crate::helpers::{get_random_email, TestApp};
+use reqwest::StatusCode;
 
 #[tokio::test]
 async fn should_return_422_if_malformed_input() {
