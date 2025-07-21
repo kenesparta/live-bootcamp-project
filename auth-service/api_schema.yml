@@ -6,8 +6,10 @@ info:
   version: 1.0.0
 
 servers:
-  - url: 'http://example.com/api'
-    description: Main server
+  - url: 'http://localhost:'
+    description: Local
+  - url: 'http://example.com'
+    description: Production
 
 paths:
   /:
