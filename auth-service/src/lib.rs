@@ -1,11 +1,11 @@
 pub mod routes;
 
+use crate::routes::{login, logout, signup, verify_2fa, verify_token};
 use axum::routing::post;
 use axum::serve::Serve;
 use axum::Router;
 use std::error::Error;
 use tower_http::services::ServeDir;
-use crate::routes::{login, logout, signup, verify_2fa, verify_token};
 
 pub struct Application {
     server: Serve<Router, Router>,
