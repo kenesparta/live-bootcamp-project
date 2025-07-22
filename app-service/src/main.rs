@@ -16,6 +16,7 @@ async fn main() {
     let app = Router::new()
         .nest_service("/assets", ServeDir::new("assets"))
         .route("/", get(root))
+        .route("/health-check", get(health_check))
         .route("/protected", get(protected));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.unwrap();
@@ -80,6 +81,10 @@ async fn protected(jar: CookieJar) -> impl IntoResponse {
         .into_response(),
         _ => StatusCode::INTERNAL_SERVER_ERROR.into_response(),
     }
+}
+
+async fn health_check() -> impl IntoResponse {
+    StatusCode::OK.into_response()
 }
 
 #[derive(Serialize)]

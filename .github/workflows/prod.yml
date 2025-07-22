@@ -3,8 +3,8 @@ name: Build, Test and Deploy to Prod
 # Trigger the workflow when changes are pushed to the main branch
 on:
   push:
-    branches:
-      - main
+    tags:
+      - v*
   workflow_dispatch:
 
 jobs:
@@ -63,26 +63,26 @@ jobs:
         set: |
           *.cache-from=type=gha
           *.cache-to=type=gha,mode=max
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-
-    - name: Setup SSH with ECDSA key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ecdsa
-        chmod 600 ~/.ssh/id_ecdsa
-        ssh-keyscan -t ecdsa -H ${{ secrets.HOST_DNS }} >> ~/.ssh/known_hosts
-
-    - name: Copy compose.yml to EC2
-      run: |
-        scp -i ~/.ssh/id_ecdsa compose.yml ec2-user@${{ secrets.HOST_DNS }}:~
-
-    - name: Restart Docker containers
-      run: |
-        ssh -i ~/.ssh/id_ecdsa ec2-user@${{ secrets.HOST_DNS }} "cd ~ && docker compose down && docker compose pull && docker compose up -d"
+#
+#   deploy:
+#     needs: build
+#     runs-on: ubuntu-latest
+#
+#     steps:
+#     - name: Checkout code
+#       uses: actions/checkout@v4
+#
+#     - name: Setup SSH with ECDSA key
+#       run: |
+#         mkdir -p ~/.ssh
+#         echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ecdsa
+#         chmod 600 ~/.ssh/id_ecdsa
+#         ssh-keyscan -t ecdsa -H ${{ secrets.HOST_DNS }} >> ~/.ssh/known_hosts
+#
+#     - name: Copy compose.yml to EC2
+#       run: |
+#         scp -i ~/.ssh/id_ecdsa compose.yml ec2-user@${{ secrets.HOST_DNS }}:~
+#
+#     - name: Restart Docker containers
+#       run: |
+#         ssh -i ~/.ssh/id_ecdsa ec2-user@${{ secrets.HOST_DNS }} "cd ~ && docker compose down && docker compose pull && docker compose up -d"
