@@ -27,6 +27,22 @@ resource "aws_security_group" "public_ec2_sg" {
     description = "HTTP web server"
   }
 
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTP web server"
+  }
+
+  ingress {
+    from_port   = 8000
+    to_port     = 8000
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+    description = "HTTP web server"
+  }
+
   egress {
     from_port   = 0
     to_port     = 0
