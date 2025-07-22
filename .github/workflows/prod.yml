@@ -79,9 +79,9 @@ jobs:
         chmod 600 ~/.ssh/id_ecdsa
         ssh-keyscan -t ecdsa -H ${{ secrets.HOST_DNS }} >> ~/.ssh/known_hosts
 
-    - name: Copy compose.json to EC2
+    - name: Copy compose.yml to EC2
       run: |
-        scp -i ~/.ssh/id_ecdsa compose.json ec2-user@${{ secrets.HOST_DNS }}:~
+        scp -i ~/.ssh/id_ecdsa compose.yml ec2-user@${{ secrets.HOST_DNS }}:~
 
     - name: Restart Docker containers
       run: |
