@@ -22,3 +22,7 @@ variable "ec2_key_pair" {
   type        = string
   description = "ssh public key pair"
 }
+
+variable "main_dns" {
+  type    = string
+}
