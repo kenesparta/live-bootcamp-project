@@ -72,15 +72,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Deploy to EC2
-      uses: appleboy/ssh-action@v1.0.0
-      with:
-        host: ${{ secrets.HOST_DNS }}
-        username: ubuntu
-        key: ${{ secrets.DEPLOY_SSH_KEY }}
-        script: |
-          cd ~
-          export AUTH_SERVICE_IP=${{ secrets.HOST_DNS }}
-          docker compose down
-          docker compose pull
-          docker compose up -d
+    - name: Setup SSH with ECDSA key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ecdsa
+        chmod 600 ~/.ssh/id_ecdsa
+        ssh-keyscan -t ecdsa -H ${{ secrets.HOST_DNS }} >> ~/.ssh/known_hosts
+
+    - name: Copy compose.json to EC2
+      run: |
+        scp -i ~/.ssh/id_ecdsa compose.json ec2-user@${{ secrets.HOST_DNS }}:~
+
+    - name: Restart Docker containers
+      run: |
+        ssh -i ~/.ssh/id_ecdsa ec2-user@${{ secrets.HOST_DNS }} "cd ~ && docker compose down && docker compose pull && docker compose up -d"
