@@ -83,7 +83,7 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
-        ssh-keyscan -H ${{ vars.HOST_DNS }} >> ~/.ssh/known_hosts
+        ssh-keyscan -t rsa,ecdsa,ed25519 -p 22 ${{ vars.HOST_DNS }} >> ~/.ssh/known_hosts 2>/dev/null || echo "Host key scan failed, using StrictHostKeyChecking=no"
 
     - name: Copy compose.yml to EC2 instance
       run: scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no compose.yml ubuntu@${{ vars.HOST_DNS }}:~
@@ -97,3 +97,7 @@ jobs:
           docker compose pull
           docker compose up -d
         EOF
+
+    - name: Cleanup SSH key
+      if: always()
+      run: rm -f ~/.ssh/id_ed25519
