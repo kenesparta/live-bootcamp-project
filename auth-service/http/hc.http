@@ -1,5 +1,5 @@
 ### Variables
-@baseUrl = http://localhost:8000
+@baseUrl = http://localhost:3000
 
 ### Health check
 GET {{baseUrl}}/health-check
