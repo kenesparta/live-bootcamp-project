@@ -1,6 +1,6 @@
 pub mod routes;
 
-use crate::routes::{login, logout, signup, verify_2fa, verify_token};
+use crate::routes::{health_check, login, logout, signup, verify_2fa, verify_token};
 use axum::routing::post;
 use axum::serve::Serve;
 use axum::Router;
@@ -16,6 +16,7 @@ impl Application {
     pub async fn build(address: &str) -> Result<Self, Box<dyn Error>> {
         let router = Router::new()
             .nest_service("/", ServeDir::new("assets"))
+            .route("/health-check", post(health_check))
             .route("/signup", post(signup))
             .route("/login", post(login))
             .route("/logout", post(logout))
