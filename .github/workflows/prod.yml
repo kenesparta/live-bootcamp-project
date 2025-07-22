@@ -72,28 +72,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
 
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-
-    - name: Setup SSH key
+    - name: Setup SSH with ECDSA key
       run: |
         mkdir -p ~/.ssh
-        echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
-        chmod 600 ~/.ssh/id_ed25519
-        ssh-keyscan -H ${{ vars.HOST_DNS }} >> ~/.ssh/known_hosts
+        echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ecdsa
+        chmod 600 ~/.ssh/id_ecdsa
+        ssh-keyscan -t ecdsa -H ${{ secrets.HOST_DNS }} >> ~/.ssh/known_hosts
 
-    - name: Copy compose.yml to EC2 instance
-      run: scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no compose.yml ubuntu@${{ vars.HOST_DNS }}:~
-
-    - name: Deploy
+    - name: Copy compose.yml to EC2
       run: |
-        ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@${{ vars.HOST_DNS }} << 'EOF'
-          cd ~
-          export AUTH_SERVICE_IP=${{ vars.HOST_DNS }}
-          docker compose down
-          docker compose pull
-          docker compose up -d
-        EOF
+        scp -i ~/.ssh/id_ecdsa compose.yml ec2-user@${{ secrets.HOST_DNS }}:~
+
+    - name: Restart Docker containers
+      run: |
+        ssh -i ~/.ssh/id_ecdsa ec2-user@${{ secrets.HOST_DNS }} "cd ~ && docker compose down && docker compose pull && docker compose up -d"
