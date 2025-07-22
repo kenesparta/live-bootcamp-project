@@ -83,16 +83,16 @@ jobs:
         mkdir -p ~/.ssh
         echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
         chmod 600 ~/.ssh/id_ed25519
-        ssh-keyscan -t rsa,ecdsa,ed25519 -p 22 ${{ vars.HOST_DNS }} >> ~/.ssh/known_hosts 2>/dev/null || echo "Host key scan failed, using StrictHostKeyChecking=no"
+        ssh-keyscan -t rsa,ecdsa,ed25519 -p 22 ${{ secrets.HOST_DNS }} >> ~/.ssh/known_hosts 2>/dev/null || echo "Host key scan failed, using StrictHostKeyChecking=no"
 
     - name: Copy compose.yml to EC2 instance
-      run: scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no compose.yml ubuntu@${{ vars.HOST_DNS }}:~
+      run: scp -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no compose.yml ubuntu@${{ secrets.HOST_DNS }}:~
 
     - name: Deploy
       run: |
-        ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@${{ vars.HOST_DNS }} << 'EOF'
+        ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=no ubuntu@${{ secrets.HOST_DNS }} << 'EOF'
           cd ~
-          export AUTH_SERVICE_IP=${{ vars.HOST_DNS }}
+          export AUTH_SERVICE_IP=${{ secrets.HOST_DNS }}
           docker compose down
           docker compose pull
           docker compose up -d
